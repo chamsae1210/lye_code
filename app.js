@@ -334,7 +334,13 @@ function renderChoices(options, correctAnswer, isCorrect, item) {
         );
         if (correctBtn) correctBtn.classList.add("correct");
         if (!wrongWordsBook.some((w) => w.ja === item.ja)) {
-          wrongWordsBook.push({ ja: item.ja, reading: item.reading || "", ko: item.ko });
+          const d = new Date();
+          wrongWordsBook.push({
+            ja: item.ja,
+            reading: item.reading || "",
+            ko: item.ko,
+            date: `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`,
+          });
         }
       }
       let wrongMsg = `오답입니다. 정답: ${correctAnswer}`;
@@ -366,23 +372,60 @@ function renderWordbook() {
   function createWordbookItem(w) {
     const li = document.createElement("li");
     li.className = "wrong-word-item";
+    const jaHtml = w.reading
+      ? `<ruby>${escapeHtml(w.ja)}<rt>${escapeHtml(w.reading)}</rt></ruby>`
+      : escapeHtml(w.ja);
     li.innerHTML = `
       <div class="wrong-word-content">
-        <div class="wrong-word-ja">${escapeHtml(w.ja)}</div>
-        ${w.reading ? `<div class="wrong-word-reading">${escapeHtml(w.reading)}</div>` : ""}
+        <div class="wrong-word-ja">${jaHtml}</div>
         <div class="wrong-word-ko">${escapeHtml(w.ko)}</div>
       </div>
       <button type="button" class="btn btn-remove-word" aria-label="삭제">×</button>
     `;
-    li.querySelector(".btn-remove-word").addEventListener("click", () => removeFromWordbook(w.ja));
+    if (w.reading) {
+      li.classList.add("show-reading");
+      li.querySelector(".wrong-word-content").addEventListener("click", (e) => {
+        if (e.target.closest(".btn-remove-word")) return;
+        li.classList.toggle("show-reading");
+      });
+    }
+    li.querySelector(".btn-remove-word").addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeFromWordbook(w.ja);
+    });
     return li;
   }
+  const byDate = {};
+  wrongWordsBook.forEach((w) => {
+    const d = w.date || "날짜 없음";
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push(w);
+  });
+  const parseDate = (s) => {
+    if (s === "날짜 없음") return new Date(0);
+    const parts = s.split("/").map(Number);
+    return new Date(parts[0], (parts[1] || 1) - 1, parts[2] || 1);
+  };
+  const dates = Object.keys(byDate).sort((a, b) => parseDate(b) - parseDate(a));
   wordbookList.innerHTML = "";
   resultWordbookList.innerHTML = "";
-  wrongWordsBook.forEach((w) => {
-    wordbookList.appendChild(createWordbookItem(w));
-    resultWordbookList.appendChild(createWordbookItem(w));
-  });
+  const addGroup = (container) => {
+    dates.forEach((dateStr) => {
+      const groupLi = document.createElement("li");
+      groupLi.className = "wordbook-date-group";
+      const header = document.createElement("div");
+      header.className = "wordbook-date-header";
+      header.textContent = dateStr;
+      const wordsUl = document.createElement("ul");
+      wordsUl.className = "wordbook-date-words";
+      byDate[dateStr].forEach((w) => wordsUl.appendChild(createWordbookItem(w)));
+      groupLi.appendChild(header);
+      groupLi.appendChild(wordsUl);
+      container.appendChild(groupLi);
+    });
+  };
+  addGroup(wordbookList);
+  addGroup(resultWordbookList);
   wordbookEmpty.classList.add("hidden");
   if (wordbookList.classList.contains("hidden")) wordbookList.classList.remove("hidden");
   if (!resultScreen.classList.contains("hidden")) {

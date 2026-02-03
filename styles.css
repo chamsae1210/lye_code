@@ -377,6 +377,32 @@ body {
   list-style: none;
   max-height: 200px;
   overflow-y: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.wrong-words-list > li.wordbook-date-group {
+  list-style: none;
+  margin-bottom: 1rem;
+}
+
+.wrong-words-list > li.wordbook-date-group:last-child {
+  margin-bottom: 0;
+}
+
+.wordbook-date-header {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.wordbook-date-words {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .wrong-word-item {
@@ -396,6 +422,11 @@ body {
 .wrong-word-content {
   flex: 1;
   min-width: 0;
+  cursor: pointer;
+}
+
+.wrong-word-content:has(ruby) {
+  cursor: pointer;
 }
 
 .wrong-word-ja {
@@ -404,10 +435,19 @@ body {
   color: var(--text);
 }
 
-.wrong-word-reading {
-  font-size: 0.8rem;
+.wrong-word-ja ruby {
+  ruby-position: over;
+}
+
+.wrong-word-ja rt {
+  font-size: 0.65em;
   color: var(--text-muted);
-  margin-top: 0.15rem;
+  font-weight: 400;
+}
+
+/* 클릭으로 요미가나 켜기/끄기 */
+.wrong-word-item:not(.show-reading) rt {
+  display: none;
 }
 
 .wrong-word-ko {
