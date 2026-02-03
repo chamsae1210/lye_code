@@ -83,7 +83,15 @@
         <button type="button" class="btn btn-primary" id="retryBtn">다시 하기</button>
         <div class="wrong-words-section hidden" id="resultWordbookSection">
           <h3>틀린 단어장</h3>
-          <ul class="wrong-words-list" id="resultWordbookList"></ul>
+          <p class="wordbook-hint">클릭하면 요미가나 표시 (한 페이지 6개)</p>
+          <div class="wordbook-pages">
+            <ul class="wrong-words-list" id="resultWordbookList"></ul>
+            <div class="wordbook-pagination hidden" id="resultWordbookPagination">
+              <button type="button" class="btn btn-page" id="resultWordbookPrev">이전</button>
+              <span class="wordbook-page-info" id="resultWordbookPageInfo">1 / 1</span>
+              <button type="button" class="btn btn-page" id="resultWordbookNext">다음</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -97,7 +105,15 @@
         <button type="button" class="btn btn-close-modal" id="closeWordbookBtn" aria-label="닫기">×</button>
       </div>
       <div class="wordbook-modal-body">
-        <ul class="wrong-words-list" id="wordbookList"></ul>
+        <p class="wordbook-hint">클릭하면 요미가나 표시 (한 페이지 6개)</p>
+        <div class="wordbook-pages">
+          <ul class="wrong-words-list" id="wordbookList"></ul>
+          <div class="wordbook-pagination hidden" id="wordbookPagination">
+            <button type="button" class="btn btn-page" id="wordbookPrev">이전</button>
+            <span class="wordbook-page-info" id="wordbookPageInfo">1 / 1</span>
+            <button type="button" class="btn btn-page" id="wordbookNext">다음</button>
+          </div>
+        </div>
         <p class="wordbook-empty hidden" id="wordbookEmpty">틀린 단어가 없습니다.</p>
         <form class="email-form" id="emailForm">
           <p class="email-helper">※ 버튼을 누르면 틀린 단어장이 <strong>sivial12100@gmail.com</strong> 으로 전송됩니다.</p>

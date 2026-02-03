@@ -370,6 +370,12 @@ body {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.wordbook-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
   margin-bottom: 0.75rem;
 }
 
@@ -568,6 +574,10 @@ body {
 .wordbook-modal-body {
   padding: 1rem 1.25rem;
   overflow-y: auto;
+}
+
+.wordbook-modal-body .wordbook-hint {
+  margin-top: 0;
 }
 
 .wordbook-modal-body .wrong-words-list {

@@ -237,9 +237,20 @@ const resultWordbookSection = document.getElementById("resultWordbookSection");
 const resultWordbookList = document.getElementById("resultWordbookList");
 const wordbookList = document.getElementById("wordbookList");
 const wordbookEmpty = document.getElementById("wordbookEmpty");
+const wordbookPagination = document.getElementById("wordbookPagination");
+const wordbookPageInfo = document.getElementById("wordbookPageInfo");
+const wordbookPrevBtn = document.getElementById("wordbookPrev");
+const wordbookNextBtn = document.getElementById("wordbookNext");
+const resultWordbookPagination = document.getElementById("resultWordbookPagination");
+const resultWordbookPageInfo = document.getElementById("resultWordbookPageInfo");
+const resultWordbookPrevBtn = document.getElementById("resultWordbookPrev");
+const resultWordbookNextBtn = document.getElementById("resultWordbookNext");
 const emailForm = document.getElementById("emailForm");
 const emailStatus = document.getElementById("emailStatus");
 const emailSubmitBtn = emailForm?.querySelector("button");
+
+const WORDS_PER_PAGE = 6;
+let wordbookCurrentPage = 0;
 
 let mode = "ja-to-ko";
 let totalQuestions = 10;
@@ -460,7 +471,6 @@ function renderWordbook() {
       <button type="button" class="btn btn-remove-word" aria-label="삭제">×</button>
     `;
     if (w.reading) {
-      li.classList.add("show-reading");
       li.querySelector(".wrong-word-content").addEventListener("click", (e) => {
         if (e.target.closest(".btn-remove-word")) return;
         li.classList.toggle("show-reading");
@@ -472,22 +482,32 @@ function renderWordbook() {
     });
     return li;
   }
-  const byDate = {};
-  wrongWordsBook.forEach((w) => {
-    const d = w.date || "날짜 없음";
-    if (!byDate[d]) byDate[d] = [];
-    byDate[d].push(w);
-  });
   const parseDate = (s) => {
     if (s === "날짜 없음") return new Date(0);
     const parts = s.split("/").map(Number);
     return new Date(parts[0], (parts[1] || 1) - 1, parts[2] || 1);
   };
-  const dates = Object.keys(byDate).sort((a, b) => parseDate(b) - parseDate(a));
-  wordbookList.innerHTML = "";
-  resultWordbookList.innerHTML = "";
-  const addGroup = (container) => {
-    dates.forEach((dateStr) => {
+  const sorted = [...wrongWordsBook].sort((a, b) => {
+    const da = a.date || "날짜 없음";
+    const db = b.date || "날짜 없음";
+    return parseDate(db) - parseDate(da);
+  });
+  const totalPages = Math.max(1, Math.ceil(sorted.length / WORDS_PER_PAGE));
+  if (wordbookCurrentPage >= totalPages) wordbookCurrentPage = Math.max(0, totalPages - 1);
+  const start = wordbookCurrentPage * WORDS_PER_PAGE;
+  const pageWords = sorted.slice(start, start + WORDS_PER_PAGE);
+
+  const byDateOnPage = {};
+  pageWords.forEach((w) => {
+    const d = w.date || "날짜 없음";
+    if (!byDateOnPage[d]) byDateOnPage[d] = [];
+    byDateOnPage[d].push(w);
+  });
+  const datesOnPage = Object.keys(byDateOnPage).sort((a, b) => parseDate(b) - parseDate(a));
+
+  function fillList(container) {
+    container.innerHTML = "";
+    datesOnPage.forEach((dateStr) => {
       const groupLi = document.createElement("li");
       groupLi.className = "wordbook-date-group";
       const header = document.createElement("div");
@@ -495,14 +515,29 @@ function renderWordbook() {
       header.textContent = dateStr;
       const wordsUl = document.createElement("ul");
       wordsUl.className = "wordbook-date-words";
-      byDate[dateStr].forEach((w) => wordsUl.appendChild(createWordbookItem(w)));
+      byDateOnPage[dateStr].forEach((w) => wordsUl.appendChild(createWordbookItem(w)));
       groupLi.appendChild(header);
       groupLi.appendChild(wordsUl);
       container.appendChild(groupLi);
     });
-  };
-  addGroup(wordbookList);
-  addGroup(resultWordbookList);
+  }
+  fillList(wordbookList);
+  fillList(resultWordbookList);
+
+  if (sorted.length > WORDS_PER_PAGE) {
+    wordbookPagination.classList.remove("hidden");
+    resultWordbookPagination.classList.remove("hidden");
+    wordbookPageInfo.textContent = `${wordbookCurrentPage + 1} / ${totalPages}`;
+    resultWordbookPageInfo.textContent = `${wordbookCurrentPage + 1} / ${totalPages}`;
+    wordbookPrevBtn.disabled = wordbookCurrentPage === 0;
+    wordbookNextBtn.disabled = wordbookCurrentPage === totalPages - 1;
+    resultWordbookPrevBtn.disabled = wordbookCurrentPage === 0;
+    resultWordbookNextBtn.disabled = wordbookCurrentPage === totalPages - 1;
+  } else {
+    wordbookPagination.classList.add("hidden");
+    resultWordbookPagination.classList.add("hidden");
+  }
+
   wordbookEmpty.classList.add("hidden");
   if (wordbookList.classList.contains("hidden")) wordbookList.classList.remove("hidden");
   if (!resultScreen.classList.contains("hidden")) {
@@ -557,10 +592,20 @@ retryBtn.addEventListener("click", () => {
   renderWordbook();
 });
 nextBtn.addEventListener("click", goNext);
+function goWordbookPage(delta) {
+  const totalPages = Math.max(1, Math.ceil(wrongWordsBook.length / WORDS_PER_PAGE));
+  wordbookCurrentPage = Math.max(0, Math.min(totalPages - 1, wordbookCurrentPage + delta));
+  renderWordbook();
+}
+
 openWordbookBtn.addEventListener("click", openWordbookModal);
 closeWordbookBtn.addEventListener("click", closeWordbookModal);
 wordbookModal.addEventListener("click", (e) => {
   if (e.target === wordbookModal) closeWordbookModal();
 });
+wordbookPrevBtn?.addEventListener("click", () => goWordbookPage(-1));
+wordbookNextBtn?.addEventListener("click", () => goWordbookPage(1));
+resultWordbookPrevBtn?.addEventListener("click", () => goWordbookPage(-1));
+resultWordbookNextBtn?.addEventListener("click", () => goWordbookPage(1));
 loadWrongWordsFromStorage();
 renderWordbook();
