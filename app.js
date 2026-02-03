@@ -221,6 +221,7 @@ const levelSelect = document.getElementById("levelSelect");
 const questionCountSelect = document.getElementById("questionCount");
 const questionText = document.getElementById("questionText");
 const questionHint = document.getElementById("questionHint");
+const questionReading = document.getElementById("questionReading");
 const questionCounter = document.getElementById("questionCounter");
 const progressFill = document.getElementById("progressFill");
 const choicesContainer = document.getElementById("choices");
@@ -411,8 +412,13 @@ function showQuestion() {
     choicesContainer.classList.add("hidden");
     choicesContainer.innerHTML = "";
     if (yomiganaInputWrap) yomiganaInputWrap.classList.remove("hidden");
+    if (questionReading) {
+      questionReading.textContent = "";
+      questionReading.classList.add("hidden");
+    }
     questionText.textContent = item.ja;
-    questionHint.textContent = `${item.ko} — 읽기를 히라가나로 입력하세요`;
+    questionHint.textContent = "읽기를 히라가나로 입력하세요";
+    if (yomiganaSubmit) yomiganaSubmit.classList.remove("hidden");
     if (yomiganaInput) {
       yomiganaInput.value = "";
       yomiganaInput.disabled = false;
@@ -451,6 +457,12 @@ function checkYomiganaAnswer() {
   if (correct) score++;
   yomiganaInput.disabled = true;
   yomiganaInput.classList.add(correct ? "correct" : "wrong");
+  if (yomiganaSubmit) yomiganaSubmit.classList.add("hidden");
+  if (questionReading) {
+    questionReading.textContent = correctReading;
+    questionReading.classList.remove("hidden");
+  }
+  questionHint.textContent = item.ko;
   if (!correct && !wrongWordsBook.some((w) => w.ja === item.ja)) {
     const d = new Date();
     wrongWordsBook.push({

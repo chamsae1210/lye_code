@@ -216,6 +216,16 @@ body {
   border: 1px solid var(--border);
 }
 
+.question-reading {
+  font-family: var(--font-ja);
+  font-size: 1.25rem;
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
 .question-text {
   font-family: var(--font-ja);
   font-size: 1.75rem;
