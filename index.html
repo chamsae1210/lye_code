@@ -11,7 +11,7 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>참색의 일본어 단어장 | 雀と日本語クイズ</title>
+  <title>雀と日本語クイズ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -22,7 +22,6 @@
   <main class="container">
     <header class="header">
       <h1>雀と日本語クイズ</h1>
-      <p class="subtitle">참색의 일본어 단어장</p>
     </header>
 
     <section class="start-screen" id="startScreen">
@@ -55,7 +54,7 @@
         </label>
       </div>
       <button type="button" class="btn btn-primary btn-start" id="startBtn">퀴즈 시작</button>
-      <button type="button" class="btn btn-wordbook" id="openWordbookBtn">틀린 단어 모아놓은 단어장 <span id="wordbookCount">(0)</span></button>
+      <button type="button" class="btn btn-wordbook" id="openWordbookBtn">오답 노트 <span id="wordbookCount">(0)</span></button>
     </section>
 
     <section class="quiz-screen hidden" id="quizScreen">
@@ -82,7 +81,7 @@
         <p class="score-message" id="scoreMessage"></p>
         <button type="button" class="btn btn-primary" id="retryBtn">다시 하기</button>
         <div class="wrong-words-section hidden" id="resultWordbookSection">
-          <h3>틀린 단어장</h3>
+          <h3>오답 노트</h3>
           <p class="wordbook-hint">클릭하면 요미가나 표시 (한 페이지 6개)</p>
           <div class="wordbook-pages">
             <ul class="wrong-words-list" id="resultWordbookList"></ul>
@@ -97,11 +96,11 @@
     </section>
   </main>
 
-  <!-- 틀린 단어장 모달 -->
+  <!-- 오답 노트 모달 -->
   <div class="wordbook-modal-overlay hidden" id="wordbookModal">
     <div class="wordbook-modal">
       <div class="wordbook-modal-header">
-        <h3>틀린 단어장</h3>
+        <h3>오답 노트</h3>
         <button type="button" class="btn btn-close-modal" id="closeWordbookBtn" aria-label="닫기">×</button>
       </div>
       <div class="wordbook-modal-body">
@@ -114,9 +113,9 @@
             <button type="button" class="btn btn-page" id="wordbookNext">다음</button>
           </div>
         </div>
-        <p class="wordbook-empty hidden" id="wordbookEmpty">틀린 단어가 없습니다.</p>
+        <p class="wordbook-empty hidden" id="wordbookEmpty">오답이 없습니다.</p>
         <form class="email-form" id="emailForm">
-          <p class="email-helper">※ 버튼을 누르면 틀린 단어장이 <strong>sivial12100@gmail.com</strong> 으로 전송됩니다.</p>
+          <p class="email-helper">※ 버튼을 누르면 오답 노트가 <strong>sivial12100@gmail.com</strong> 으로 전송됩니다.</p>
           <button type="submit" class="btn btn-primary">내 메일로 보내기</button>
         </form>
         <p class="email-status hidden" id="emailStatus"></p>
