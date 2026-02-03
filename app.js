@@ -250,6 +250,29 @@ let levelPool = [];
 let answered = false;
 let wrongWordsBook = []; // 틀린 단어장 { ja, reading, ko, date }
 
+const WORDS_STORAGE_KEY = "japanese-quiz-wrong-words";
+
+function loadWrongWordsFromStorage() {
+  try {
+    const raw = localStorage.getItem(WORDS_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      wrongWordsBook = parsed;
+    }
+  } catch (error) {
+    console.warn("Failed to load wordbook from storage.", error);
+  }
+}
+
+function saveWrongWordsToStorage() {
+  try {
+    localStorage.setItem(WORDS_STORAGE_KEY, JSON.stringify(wrongWordsBook));
+  } catch (error) {
+    console.warn("Failed to save wordbook to storage.", error);
+  }
+}
+
 // 이메일 전송 상태 표시
 function showEmailStatus(type, message) {
   if (!emailStatus) return;
@@ -394,6 +417,7 @@ function renderChoices(options, correctAnswer, isCorrect, item) {
             ko: item.ko,
             date: `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`,
           });
+          saveWrongWordsToStorage();
         }
       }
       let wrongMsg = `오답입니다. 정답: ${correctAnswer}`;
@@ -495,6 +519,7 @@ function escapeHtml(str) {
 function removeFromWordbook(ja) {
   wrongWordsBook = wrongWordsBook.filter((w) => w.ja !== ja);
   renderWordbook();
+  saveWrongWordsToStorage();
 }
 
 function showResult() {
@@ -537,4 +562,5 @@ closeWordbookBtn.addEventListener("click", closeWordbookModal);
 wordbookModal.addEventListener("click", (e) => {
   if (e.target === wordbookModal) closeWordbookModal();
 });
+loadWrongWordsFromStorage();
 renderWordbook();

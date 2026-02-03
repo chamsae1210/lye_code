@@ -26,13 +26,11 @@ export default async function handler(req, res) {
       const ja = escapeHtml(word.ja || "");
       const reading = word.reading ? `<span style="color:#8D99AE;font-size:12px;">${escapeHtml(word.reading)}</span>` : "";
       const ko = escapeHtml(word.ko || "");
-      const date = word.date ? `<div style="color:#8D99AE;font-size:12px;margin-top:2px;">틀린 날짜: ${escapeHtml(word.date)}</div>` : "";
       return `
         <li style="margin-bottom:14px;">
           <div style="font-size:18px;font-weight:600;">${ja}</div>
           ${reading}
           <div style="margin-top:4px;font-size:14px;">${ko}</div>
-          ${date}
         </li>
       `;
     })
