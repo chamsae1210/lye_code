@@ -77,6 +77,73 @@ body {
 }
 
 /* Start screen */
+.add-word-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.add-word-section .section-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.add-word-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add-word-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  font-family: var(--font-ja), var(--font-ko);
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.add-word-input::placeholder {
+  color: var(--text-muted);
+}
+
+.add-word-input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.add-word-level {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.add-word-level select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-ko);
+  font-size: 0.9rem;
+  background: var(--bg-elevated);
+  color: var(--text);
+  margin-left: 0.5rem;
+}
+
+.add-word-form .btn-add-word {
+  margin-top: 0.25rem;
+}
+
+.vocabulary-count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
 .start-screen .mode-select {
   margin-bottom: 1.5rem;
 }

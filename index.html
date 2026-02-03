@@ -25,6 +25,26 @@
     </header>
 
     <section class="start-screen" id="startScreen">
+      <div class="add-word-section">
+        <p class="section-label">단어 추가</p>
+        <form class="add-word-form" id="addWordForm">
+          <input type="text" id="addWordJa" class="add-word-input" placeholder="한자" maxlength="50" />
+          <input type="text" id="addWordReading" class="add-word-input" placeholder="요미가나" maxlength="100" />
+          <input type="text" id="addWordKo" class="add-word-input" placeholder="한국어 뜻" maxlength="100" />
+          <label class="add-word-level">
+            <span>난이도</span>
+            <select id="addWordLevel">
+              <option value="n5">N5</option>
+              <option value="n4">N4</option>
+              <option value="n3" selected>N3</option>
+              <option value="n2">N2</option>
+              <option value="n1">N1</option>
+            </select>
+          </label>
+          <button type="submit" class="btn btn-primary btn-add-word">추가</button>
+        </form>
+        <p class="vocabulary-count" id="vocabularyCount">현재 단어 0개</p>
+      </div>
       <div class="mode-select">
         <p class="mode-label">퀴즈 모드 선택</p>
         <div class="mode-buttons">
