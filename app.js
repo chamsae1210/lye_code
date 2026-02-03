@@ -78,6 +78,8 @@ const myWordsModal = document.getElementById("myWordsModal");
 const closeMyWordsBtn = document.getElementById("closeMyWordsBtn");
 const myWordsListBody = document.getElementById("myWordsListBody");
 const myWordsEmpty = document.getElementById("myWordsEmpty");
+const myWordsViewByDate = document.getElementById("myWordsViewByDate");
+const myWordsViewAll = document.getElementById("myWordsViewAll");
 
 const WORDS_PER_PAGE = 6;
 let wordbookCurrentPage = 0;
@@ -604,7 +606,37 @@ function renderMyWordsList() {
   });
 }
 
+function renderMyWordsListAll() {
+  if (!myWordsListBody || !myWordsEmpty) return;
+  if (VOCABULARY.length === 0) {
+    myWordsEmpty.classList.remove("hidden");
+    myWordsListBody.innerHTML = "";
+    return;
+  }
+  myWordsEmpty.classList.add("hidden");
+  const summary = document.createElement("p");
+  summary.className = "my-words-summary";
+  summary.textContent = `등록된 단어 ${VOCABULARY.length}개`;
+  const wordsList = document.createElement("ul");
+  wordsList.className = "my-words-list my-words-list-all";
+  VOCABULARY.forEach((w) => {
+    const li = document.createElement("li");
+    li.className = "my-word-item";
+    const jaHtml = w.reading
+      ? `<ruby>${escapeHtml(w.ja)}<rt>${escapeHtml(w.reading)}</rt></ruby>`
+      : escapeHtml(w.ja);
+    const dateStr = w.dateAdded || "날짜 없음";
+    li.innerHTML = `<div class="my-word-ja">${jaHtml}</div><div class="my-word-ko">${escapeHtml(w.ko)}</div><div class="my-word-date">${escapeHtml(dateStr)}</div>`;
+    wordsList.appendChild(li);
+  });
+  myWordsListBody.innerHTML = "";
+  myWordsListBody.appendChild(summary);
+  myWordsListBody.appendChild(wordsList);
+}
+
 function openMyWordsModal() {
+  document.querySelectorAll(".btn-view-toggle").forEach((b) => b.classList.remove("active"));
+  myWordsViewByDate?.classList.add("active");
   renderMyWordsList();
   myWordsModal.classList.remove("hidden");
 }
@@ -642,6 +674,16 @@ openMyWordsBtn?.addEventListener("click", openMyWordsModal);
 closeMyWordsBtn?.addEventListener("click", closeMyWordsModal);
 myWordsModal?.addEventListener("click", (e) => {
   if (e.target === myWordsModal) closeMyWordsModal();
+});
+myWordsViewByDate?.addEventListener("click", () => {
+  document.querySelectorAll(".btn-view-toggle").forEach((b) => b.classList.remove("active"));
+  myWordsViewByDate.classList.add("active");
+  renderMyWordsList();
+});
+myWordsViewAll?.addEventListener("click", () => {
+  document.querySelectorAll(".btn-view-toggle").forEach((b) => b.classList.remove("active"));
+  myWordsViewAll.classList.add("active");
+  renderMyWordsListAll();
 });
 wordbookPrevBtn?.addEventListener("click", () => goWordbookPage(-1));
 wordbookNextBtn?.addEventListener("click", () => goWordbookPage(1));

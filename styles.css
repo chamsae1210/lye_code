@@ -781,10 +781,55 @@ body {
   color: var(--text);
 }
 
+.my-words-view-toggle {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.btn-view-toggle {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.btn-view-toggle:hover {
+  border-color: var(--border-focus);
+  color: var(--text);
+}
+
+.btn-view-toggle.active {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent);
+}
+
 .my-words-modal-body {
   padding: 1rem 1.25rem;
   overflow-y: auto;
   max-height: 60vh;
+}
+
+.my-words-summary {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.my-words-list-all .my-word-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.my-word-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .my-words-empty {
