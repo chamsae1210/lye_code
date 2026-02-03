@@ -325,7 +325,7 @@ emailForm?.addEventListener("submit", async (e) => {
     if (!response.ok) {
       throw new Error(result.error || "이메일 전송에 실패했습니다.");
     }
-    showEmailStatus("success", "dia1210d@naver.com 으로 전송했습니다!");
+    showEmailStatus("success", "sivial12100@gmail.com 으로 전송했습니다!");
   } catch (error) {
     showEmailStatus("error", error.message || "이메일 전송에 실패했습니다.");
   } finally {
