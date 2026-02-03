@@ -1,4 +1,4 @@
-const TARGET_EMAIL = "sivial12100@gmail.com";
+const TARGET_EMAIL = "dia1210d@naver.com";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
