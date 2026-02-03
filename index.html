@@ -31,16 +31,6 @@
           <input type="text" id="addWordJa" class="add-word-input" placeholder="한자" maxlength="50" />
           <input type="text" id="addWordReading" class="add-word-input" placeholder="요미가나" maxlength="100" />
           <input type="text" id="addWordKo" class="add-word-input" placeholder="한국어 뜻" maxlength="100" />
-          <label class="add-word-level">
-            <span>난이도</span>
-            <select id="addWordLevel">
-              <option value="n5">N5</option>
-              <option value="n4">N4</option>
-              <option value="n3" selected>N3</option>
-              <option value="n2">N2</option>
-              <option value="n1">N1</option>
-            </select>
-          </label>
           <button type="submit" class="btn btn-primary btn-add-word">추가</button>
         </form>
         <p class="vocabulary-count" id="vocabularyCount">현재 단어 0개</p>
@@ -53,17 +43,14 @@
           <button type="button" class="btn btn-mode" data-mode="yomigana-input">요미가나 입력</button>
         </div>
       </div>
+      <div class="quiz-source-select">
+        <p class="mode-label">퀴즈 범위</p>
+        <div class="quiz-source-buttons">
+          <button type="button" class="btn btn-quiz-source active" data-source="all">전체 단어</button>
+          <button type="button" class="btn btn-quiz-source" data-source="wrong-only">오답 노트만</button>
+        </div>
+      </div>
       <div class="quiz-options">
-        <label class="option-row">
-          <span>난이도</span>
-          <select id="levelSelect">
-            <option value="n5">N5 (가장 쉬움)</option>
-            <option value="n4">N4</option>
-            <option value="n3" selected>N3</option>
-            <option value="n2">N2</option>
-            <option value="n1">N1 (가장 어려움)</option>
-          </select>
-        </label>
         <label class="option-row">
           <span>문제 수</span>
           <select id="questionCount">
@@ -76,6 +63,7 @@
       </div>
       <button type="button" class="btn btn-primary btn-start" id="startBtn">퀴즈 시작</button>
       <button type="button" class="btn btn-wordbook" id="openWordbookBtn">오답 노트 <span id="wordbookCount">(0)</span></button>
+      <button type="button" class="btn btn-my-words" id="openMyWordsBtn">내가 추가한 단어</button>
     </section>
 
     <section class="quiz-screen hidden" id="quizScreen">
@@ -145,6 +133,19 @@
           <button type="submit" class="btn btn-primary">내 메일로 보내기</button>
         </form>
         <p class="email-status hidden" id="emailStatus"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 내가 추가한 단어 (날짜별) 모달 -->
+  <div class="my-words-modal-overlay hidden" id="myWordsModal">
+    <div class="my-words-modal">
+      <div class="my-words-modal-header">
+        <h3>내가 추가한 단어</h3>
+        <button type="button" class="btn btn-close-modal" id="closeMyWordsBtn" aria-label="닫기">×</button>
+      </div>
+      <div class="my-words-modal-body" id="myWordsListBody">
+        <p class="my-words-empty hidden" id="myWordsEmpty">추가한 단어가 없습니다.</p>
       </div>
     </div>
   </div>

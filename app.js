@@ -7,7 +7,14 @@ function loadVocabularyFromStorage() {
     const raw = localStorage.getItem(VOCABULARY_STORAGE_KEY);
     if (!raw) return;
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) VOCABULARY = parsed;
+    if (Array.isArray(parsed)) {
+      VOCABULARY = parsed.map((v) => ({
+        ja: v.ja,
+        reading: v.reading || "",
+        ko: v.ko,
+        dateAdded: v.dateAdded || "날짜 없음",
+      }));
+    }
   } catch (e) {
     console.warn("Failed to load vocabulary.", e);
   }
@@ -27,7 +34,6 @@ const quizScreen = document.getElementById("quizScreen");
 const resultScreen = document.getElementById("resultScreen");
 const startBtn = document.getElementById("startBtn");
 const retryBtn = document.getElementById("retryBtn");
-const levelSelect = document.getElementById("levelSelect");
 const questionCountSelect = document.getElementById("questionCount");
 const questionText = document.getElementById("questionText");
 const questionHint = document.getElementById("questionHint");
@@ -66,13 +72,18 @@ const addWordForm = document.getElementById("addWordForm");
 const addWordJa = document.getElementById("addWordJa");
 const addWordReading = document.getElementById("addWordReading");
 const addWordKo = document.getElementById("addWordKo");
-const addWordLevel = document.getElementById("addWordLevel");
 const vocabularyCount = document.getElementById("vocabularyCount");
+const openMyWordsBtn = document.getElementById("openMyWordsBtn");
+const myWordsModal = document.getElementById("myWordsModal");
+const closeMyWordsBtn = document.getElementById("closeMyWordsBtn");
+const myWordsListBody = document.getElementById("myWordsListBody");
+const myWordsEmpty = document.getElementById("myWordsEmpty");
 
 const WORDS_PER_PAGE = 6;
 let wordbookCurrentPage = 0;
 
 let mode = "ja-to-ko";
+let quizSource = "all"; // "all" | "wrong-only"
 let totalQuestions = 10;
 let currentIndex = 0;
 let score = 0;
@@ -164,6 +175,14 @@ document.querySelectorAll(".btn-mode").forEach((btn) => {
 });
 document.querySelector('.btn-mode[data-mode="ja-to-ko"]').classList.add("active");
 
+document.querySelectorAll(".btn-quiz-source").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".btn-quiz-source").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    quizSource = btn.dataset.source;
+  });
+});
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -188,12 +207,13 @@ addWordForm?.addEventListener("submit", (e) => {
   const ja = (addWordJa?.value || "").trim();
   const reading = (addWordReading?.value || "").trim();
   const ko = (addWordKo?.value || "").trim();
-  const level = (addWordLevel?.value || "n5").toLowerCase();
   if (!ja || !reading || !ko) {
     alert("한자, 요미가나, 한국어 뜻을 모두 입력해 주세요.");
     return;
   }
-  VOCABULARY.push({ ja, reading, ko, level });
+  const d = new Date();
+  const dateAdded = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+  VOCABULARY.push({ ja, reading, ko, dateAdded });
   saveVocabularyToStorage();
   updateVocabularyCount();
   addWordJa.value = "";
@@ -202,33 +222,59 @@ addWordForm?.addEventListener("submit", (e) => {
   if (addWordJa) addWordJa.focus();
 });
 
-function startQuiz() {
-  if (VOCABULARY.length === 0) {
-    alert("단어를 먼저 추가해 주세요.");
-    return;
+function getUniqueWrongWords() {
+  const seen = new Set();
+  return wrongWordsBook.filter((w) => {
+    if (seen.has(w.ja)) return false;
+    seen.add(w.ja);
+    return true;
+  });
+}
+
+function startQuiz(poolOverride) {
+  let pool = poolOverride;
+  if (!pool) {
+    if (quizSource === "wrong-only") {
+      pool = getUniqueWrongWords();
+      if (pool.length === 0) {
+        alert("오답 노트에 단어가 없습니다. 퀴즈를 풀어 틀린 단어를 쌓아 주세요.");
+        return;
+      }
+    } else {
+      if (VOCABULARY.length === 0) {
+        alert("단어를 먼저 추가해 주세요.");
+        return;
+      }
+      pool = VOCABULARY;
+    }
   }
-  const level = levelSelect.value;
-  levelPool = VOCABULARY.filter((v) => v.level === level);
-  if (levelPool.length === 0) {
-    alert("선택한 난이도에 단어가 없습니다. 다른 난이도를 선택해 주세요.");
-    return;
-  }
-  const pool = mode === "yomigana-input"
+  levelPool = pool;
+  const withReading = mode === "yomigana-input"
     ? levelPool.filter((v) => v.reading && v.reading.trim())
     : levelPool;
-  if (pool.length === 0) {
-    alert("요미가나 입력 모드에서는 읽기가 있는 단어만 나옵니다. 선택한 난이도에 해당 단어가 없습니다.");
+  if (withReading.length === 0) {
+    alert("요미가나 입력 모드에서는 읽기가 있는 단어만 나옵니다.");
     return;
   }
   const requested = Number(questionCountSelect.value);
-  totalQuestions = Math.min(requested, pool.length);
-  quizList = shuffle(pool).slice(0, totalQuestions);
+  totalQuestions = Math.min(requested, withReading.length);
+  quizList = shuffle(withReading).slice(0, totalQuestions);
   currentIndex = 0;
   score = 0;
   startScreen.classList.add("hidden");
   quizScreen.classList.remove("hidden");
   resultScreen.classList.add("hidden");
+  if (myWordsModal && !myWordsModal.classList.contains("hidden")) closeMyWordsModal();
   showQuestion();
+}
+
+function startQuizFromDate(dateStr) {
+  const pool = VOCABULARY.filter((v) => (v.dateAdded || "날짜 없음") === dateStr);
+  if (pool.length === 0) {
+    alert("이 날짜에 추가한 단어가 없습니다.");
+    return;
+  }
+  startQuiz(pool);
 }
 
 function normalizeReading(str) {
@@ -250,7 +296,7 @@ function showQuestion() {
   progressFill.style.width = `${progress}%`;
   questionCounter.textContent = `${currentIndex + 1} / ${totalQuestions}`;
 
-  const pool = levelPool.length > 0 ? levelPool : VOCABULARY;
+  const choicePool = levelPool.length >= 4 ? levelPool : VOCABULARY;
   if (mode === "yomigana-input") {
     choicesContainer.classList.add("hidden");
     choicesContainer.innerHTML = "";
@@ -276,12 +322,12 @@ function showQuestion() {
   if (mode === "ja-to-ko") {
     questionText.textContent = item.ja;
     questionHint.textContent = "뜻을 고르세요";
-    const options = [item.ko, ...getWrongChoices(item.ko, 3, pool)];
+    const options = [item.ko, ...getWrongChoices(item.ko, 3, choicePool)];
     renderChoices(shuffle(options), item.ko, (choice) => choice === item.ko, item);
   } else {
     questionText.textContent = item.ko;
     questionHint.textContent = "일본어로 맞는 것을 고르세요";
-    const wrongJas = pool.filter((v) => v.ja !== item.ja).map((v) => v.ja);
+    const wrongJas = choicePool.filter((v) => v.ja !== item.ja).map((v) => v.ja);
     const options = [item.ja, ...shuffle(wrongJas).slice(0, 3)];
     renderChoices(shuffle(options), item.ja, (choice) => choice === item.ja, item);
   }
@@ -507,6 +553,66 @@ function closeWordbookModal() {
   wordbookModal.classList.add("hidden");
 }
 
+function parseDateForSort(s) {
+  if (!s || s === "날짜 없음") return new Date(0);
+  const parts = s.split("/").map(Number);
+  return new Date(parts[0], (parts[1] || 1) - 1, parts[2] || 1);
+}
+
+function renderMyWordsList() {
+  if (!myWordsListBody || !myWordsEmpty) return;
+  if (VOCABULARY.length === 0) {
+    myWordsEmpty.classList.remove("hidden");
+    myWordsListBody.innerHTML = "";
+    return;
+  }
+  myWordsEmpty.classList.add("hidden");
+  const byDate = {};
+  VOCABULARY.forEach((v) => {
+    const d = v.dateAdded || "날짜 없음";
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push(v);
+  });
+  const dates = Object.keys(byDate).sort((a, b) => parseDateForSort(b) - parseDateForSort(a));
+  myWordsListBody.innerHTML = "";
+  dates.forEach((dateStr) => {
+    const section = document.createElement("div");
+    section.className = "my-words-date-group";
+    const header = document.createElement("div");
+    header.className = "my-words-date-header";
+    header.textContent = dateStr;
+    const wordsList = document.createElement("ul");
+    wordsList.className = "my-words-list";
+    byDate[dateStr].forEach((w) => {
+      const li = document.createElement("li");
+      li.className = "my-word-item";
+      const jaHtml = w.reading
+        ? `<ruby>${escapeHtml(w.ja)}<rt>${escapeHtml(w.reading)}</rt></ruby>`
+        : escapeHtml(w.ja);
+      li.innerHTML = `<div class="my-word-ja">${jaHtml}</div><div class="my-word-ko">${escapeHtml(w.ko)}</div>`;
+      wordsList.appendChild(li);
+    });
+    const quizBtn = document.createElement("button");
+    quizBtn.type = "button";
+    quizBtn.className = "btn btn-small btn-date-quiz";
+    quizBtn.textContent = "이 날짜로 퀴즈";
+    quizBtn.addEventListener("click", () => startQuizFromDate(dateStr));
+    section.appendChild(header);
+    section.appendChild(wordsList);
+    section.appendChild(quizBtn);
+    myWordsListBody.appendChild(section);
+  });
+}
+
+function openMyWordsModal() {
+  renderMyWordsList();
+  myWordsModal.classList.remove("hidden");
+}
+
+function closeMyWordsModal() {
+  myWordsModal.classList.add("hidden");
+}
+
 startBtn.addEventListener("click", startQuiz);
 retryBtn.addEventListener("click", () => {
   resultScreen.classList.add("hidden");
@@ -531,6 +637,11 @@ openWordbookBtn.addEventListener("click", openWordbookModal);
 closeWordbookBtn.addEventListener("click", closeWordbookModal);
 wordbookModal.addEventListener("click", (e) => {
   if (e.target === wordbookModal) closeWordbookModal();
+});
+openMyWordsBtn?.addEventListener("click", openMyWordsModal);
+closeMyWordsBtn?.addEventListener("click", closeMyWordsModal);
+myWordsModal?.addEventListener("click", (e) => {
+  if (e.target === myWordsModal) closeMyWordsModal();
 });
 wordbookPrevBtn?.addEventListener("click", () => goWordbookPage(-1));
 wordbookNextBtn?.addEventListener("click", () => goWordbookPage(1));

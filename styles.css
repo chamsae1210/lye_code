@@ -115,25 +115,6 @@ body {
   border-color: var(--border-focus);
 }
 
-.add-word-level {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.add-word-level select {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-family: var(--font-ko);
-  font-size: 0.9rem;
-  background: var(--bg-elevated);
-  color: var(--text);
-  margin-left: 0.5rem;
-}
-
 .add-word-form .btn-add-word {
   margin-top: 0.25rem;
 }
@@ -207,6 +188,35 @@ body {
   box-shadow: 0 4px 16px rgba(255, 255, 255, 0.15);
 }
 
+.quiz-source-select {
+  margin-bottom: 1rem;
+}
+
+.quiz-source-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-quiz-source {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.btn-quiz-source:hover {
+  border-color: var(--border-focus);
+  color: var(--text);
+}
+
+.btn-quiz-source.active {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent);
+}
+
 .quiz-options {
   margin-bottom: 1rem;
 }
@@ -248,6 +258,21 @@ body {
 }
 
 .btn-wordbook:hover {
+  border-color: var(--border-focus);
+  color: var(--text);
+}
+
+.btn-my-words {
+  width: 100%;
+  padding: 0.65rem;
+  margin-top: 0.5rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  font-size: 0.9rem;
+}
+
+.btn-my-words:hover {
   border-color: var(--border-focus);
   color: var(--text);
 }
@@ -716,6 +741,123 @@ body {
   padding: 2rem 1rem;
   color: var(--text-muted);
   font-size: 0.9rem;
+}
+
+/* 내가 추가한 단어 모달 */
+.my-words-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.my-words-modal {
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.my-words-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.my-words-modal-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.my-words-modal-body {
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.my-words-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.my-words-date-group {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.my-words-date-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.my-words-date-header {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.my-words-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem 0;
+}
+
+.my-word-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  font-size: 0.9rem;
+}
+
+.my-word-ja {
+  font-family: var(--font-ja);
+  font-weight: 500;
+  color: var(--text);
+  min-width: 4em;
+}
+
+.my-word-ja ruby {
+  ruby-position: over;
+}
+
+.my-word-ja rt {
+  font-size: 0.65em;
+  color: var(--text-muted);
+}
+
+.my-word-ko {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.btn-date-quiz {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-date-quiz:hover {
+  border-color: var(--border-focus);
+  background: #2a2a2a;
 }
 
 @media (max-width: 480px) {
