@@ -238,6 +238,56 @@ body {
   gap: 0.75rem;
 }
 
+/* 요미가나 입력 모드 */
+.yomigana-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.yomigana-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-family: var(--font-ja);
+  font-size: 1.25rem;
+  color: var(--text);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.yomigana-input::placeholder {
+  color: var(--text-muted);
+}
+
+.yomigana-input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.yomigana-input.correct {
+  border-color: var(--correct);
+  background: var(--correct-bg);
+  color: var(--correct);
+}
+
+.yomigana-input.wrong {
+  border-color: var(--wrong);
+  background: var(--wrong-bg);
+  color: var(--wrong);
+}
+
+.yomigana-input:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+.btn-yomigana-submit {
+  width: 100%;
+}
+
 .choice-btn {
   width: 100%;
   padding: 1rem 1.25rem;

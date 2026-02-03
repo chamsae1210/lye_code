@@ -224,6 +224,9 @@ const questionHint = document.getElementById("questionHint");
 const questionCounter = document.getElementById("questionCounter");
 const progressFill = document.getElementById("progressFill");
 const choicesContainer = document.getElementById("choices");
+const yomiganaInputWrap = document.getElementById("yomiganaInputWrap");
+const yomiganaInput = document.getElementById("yomiganaInput");
+const yomiganaSubmit = document.getElementById("yomiganaSubmit");
 const feedbackEl = document.getElementById("feedback");
 const nextBtn = document.getElementById("nextBtn");
 const scoreValue = document.getElementById("scoreValue");
@@ -366,15 +369,32 @@ function startQuiz() {
     alert("선택한 난이도에 단어가 없습니다. 다른 난이도를 선택해 주세요.");
     return;
   }
+  const pool = mode === "yomigana-input"
+    ? levelPool.filter((v) => v.reading && v.reading.trim())
+    : levelPool;
+  if (pool.length === 0) {
+    alert("요미가나 입력 모드에서는 읽기가 있는 단어만 나옵니다. 선택한 난이도에 해당 단어가 없습니다.");
+    return;
+  }
   const requested = Number(questionCountSelect.value);
-  totalQuestions = Math.min(requested, levelPool.length);
-  quizList = shuffle(levelPool).slice(0, totalQuestions);
+  totalQuestions = Math.min(requested, pool.length);
+  quizList = shuffle(pool).slice(0, totalQuestions);
   currentIndex = 0;
   score = 0;
   startScreen.classList.add("hidden");
   quizScreen.classList.remove("hidden");
   resultScreen.classList.add("hidden");
   showQuestion();
+}
+
+function normalizeReading(str) {
+  if (!str || typeof str !== "string") return "";
+  const s = str.trim().replace(/\s+/g, "");
+  return s.split("").map((c) => {
+    const code = c.charCodeAt(0);
+    if (code >= 0x30a1 && code <= 0x30f6) return String.fromCharCode(code - 0x60);
+    return c;
+  }).join("");
 }
 
 function showQuestion() {
@@ -387,6 +407,23 @@ function showQuestion() {
   questionCounter.textContent = `${currentIndex + 1} / ${totalQuestions}`;
 
   const pool = levelPool.length > 0 ? levelPool : VOCABULARY;
+  if (mode === "yomigana-input") {
+    choicesContainer.classList.add("hidden");
+    choicesContainer.innerHTML = "";
+    if (yomiganaInputWrap) yomiganaInputWrap.classList.remove("hidden");
+    questionText.textContent = item.ja;
+    questionHint.textContent = `${item.ko} — 읽기를 히라가나로 입력하세요`;
+    if (yomiganaInput) {
+      yomiganaInput.value = "";
+      yomiganaInput.disabled = false;
+      yomiganaInput.classList.remove("correct", "wrong");
+      setTimeout(() => yomiganaInput.focus(), 100);
+    }
+    return;
+  }
+
+  if (yomiganaInputWrap) yomiganaInputWrap.classList.add("hidden");
+  choicesContainer.classList.remove("hidden");
   if (mode === "ja-to-ko") {
     questionText.textContent = item.ja;
     questionHint.textContent = "뜻을 고르세요";
@@ -399,6 +436,36 @@ function showQuestion() {
     const options = [item.ja, ...shuffle(wrongJas).slice(0, 3)];
     renderChoices(shuffle(options), item.ja, (choice) => choice === item.ja, item);
   }
+}
+
+function checkYomiganaAnswer() {
+  if (answered || !yomiganaInput) return;
+  const item = quizList[currentIndex];
+  const correctReading = (item.reading || "").trim();
+  if (!correctReading) return;
+  const userRaw = yomiganaInput.value;
+  const userNorm = normalizeReading(userRaw);
+  const correctNorm = normalizeReading(correctReading);
+  const correct = userNorm === correctNorm;
+  answered = true;
+  if (correct) score++;
+  yomiganaInput.disabled = true;
+  yomiganaInput.classList.add(correct ? "correct" : "wrong");
+  if (!correct && !wrongWordsBook.some((w) => w.ja === item.ja)) {
+    const d = new Date();
+    wrongWordsBook.push({
+      ja: item.ja,
+      reading: item.reading || "",
+      ko: item.ko,
+      date: `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`,
+    });
+    saveWrongWordsToStorage();
+  }
+  const wrongMsg = `오답입니다. 정답: ${correctReading}`;
+  feedbackEl.textContent = correct ? "정답입니다!" : wrongMsg;
+  feedbackEl.className = `feedback ${correct ? "correct-msg" : "wrong-msg"}`;
+  feedbackEl.classList.remove("hidden");
+  nextBtn.classList.remove("hidden");
 }
 
 function renderChoices(options, correctAnswer, isCorrect, item) {
@@ -592,6 +659,13 @@ retryBtn.addEventListener("click", () => {
   renderWordbook();
 });
 nextBtn.addEventListener("click", goNext);
+yomiganaSubmit?.addEventListener("click", checkYomiganaAnswer);
+yomiganaInput?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    checkYomiganaAnswer();
+  }
+});
 function goWordbookPage(delta) {
   const totalPages = Math.max(1, Math.ceil(wrongWordsBook.length / WORDS_PER_PAGE));
   wordbookCurrentPage = Math.max(0, Math.min(totalPages - 1, wordbookCurrentPage + delta));

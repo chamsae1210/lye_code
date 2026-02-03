@@ -30,6 +30,7 @@
         <div class="mode-buttons">
           <button type="button" class="btn btn-mode" data-mode="ja-to-ko">일본어 → 한국어</button>
           <button type="button" class="btn btn-mode" data-mode="ko-to-ja">한국어 → 일본어</button>
+          <button type="button" class="btn btn-mode" data-mode="yomigana-input">요미가나 입력</button>
         </div>
       </div>
       <div class="quiz-options">
@@ -67,6 +68,10 @@
         <p class="question-hint" id="questionHint"></p>
       </div>
       <div class="choices" id="choices"></div>
+      <div class="yomigana-input-wrap hidden" id="yomiganaInputWrap">
+        <input type="text" id="yomiganaInput" class="yomigana-input" placeholder="히라가나로 읽기 입력" autocomplete="off" />
+        <button type="button" class="btn btn-primary btn-yomigana-submit" id="yomiganaSubmit">확인</button>
+      </div>
       <p class="feedback hidden" id="feedback"></p>
       <button type="button" class="btn btn-next hidden" id="nextBtn">다음</button>
     </section>
