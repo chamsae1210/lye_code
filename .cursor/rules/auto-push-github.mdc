@@ -1,0 +1,17 @@
+---
+description: japanese-quiz 수정 시 자동으로 GitHub에 푸시
+globs: japanese-quiz/**/*
+alwaysApply: true
+---
+
+# 자동 GitHub 푸시
+
+japanese-quiz 프로젝트의 `index.html`, `styles.css`, `app.js`를 수정한 후에는 **사용자 요청 없이** 바로 다음을 실행한다:
+
+1. `git add index.html styles.css app.js`
+2. `git commit -m "적절한 커밋 메시지"` (영문 권장, 한글은 인코딩 이슈 가능)
+3. `git push origin main`
+
+저장소: https://github.com/chamsae1210/lye_code.git
+
+위 작업은 수정 직후 같은 터미널 턴에서 실행한다.

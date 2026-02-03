@@ -1,9 +1,3 @@
-// Supabase 클라이언트 (config.js에 URL, KEY 설정 필요)
-let supabase = null;
-if (typeof SUPABASE_URL === "string" && SUPABASE_URL && typeof SUPABASE_ANON_KEY === "string" && SUPABASE_ANON_KEY) {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
-
 // 일본어 단어 데이터 JLPT N1~N5 (일본어, 요미가나, 한국어 뜻, 레벨)
 const VOCABULARY = [
   // N5
@@ -243,16 +237,10 @@ const resultWordbookSection = document.getElementById("resultWordbookSection");
 const resultWordbookList = document.getElementById("resultWordbookList");
 const wordbookList = document.getElementById("wordbookList");
 const wordbookEmpty = document.getElementById("wordbookEmpty");
-const loginBtn = document.getElementById("loginBtn");
-const signupBtn = document.getElementById("signupBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const userName = document.getElementById("userName");
-const loginModal = document.getElementById("loginModal");
-const signupModal = document.getElementById("signupModal");
-const loginForm = document.getElementById("loginForm");
-const signupForm = document.getElementById("signupForm");
-const loginError = document.getElementById("loginError");
-const signupError = document.getElementById("signupError");
+const emailForm = document.getElementById("emailForm");
+const emailInput = document.getElementById("emailInput");
+const emailStatus = document.getElementById("emailStatus");
+const emailSubmitBtn = emailForm?.querySelector("button");
 
 let mode = "ja-to-ko";
 let totalQuestions = 10;
@@ -263,136 +251,61 @@ let levelPool = [];
 let answered = false;
 let wrongWordsBook = []; // 틀린 단어장 { ja, reading, ko, date }
 
-// ========== 인증 ==========
-function showAuthUI(user) {
-  if (user) {
-    const name = user.user_metadata?.username || user.email?.split("@")[0] || "사용자";
-    userName.textContent = `${name}님`;
-    userName.classList.remove("hidden");
-    loginBtn.classList.add("hidden");
-    signupBtn.classList.add("hidden");
-    logoutBtn.classList.remove("hidden");
-  } else {
-    userName.classList.add("hidden");
-    loginBtn.classList.remove("hidden");
-    signupBtn.classList.remove("hidden");
-    logoutBtn.classList.add("hidden");
-  }
+// 이메일 전송 상태 표시
+function showEmailStatus(type, message) {
+  if (!emailStatus) return;
+  emailStatus.textContent = message;
+  emailStatus.classList.remove("hidden", "success", "error");
+  emailStatus.classList.add(type === "success" ? "success" : "error");
 }
 
-function closeAuthModal(modalId) {
-  document.getElementById(modalId).classList.add("hidden");
+function hideEmailStatusWithDelay() {
+  if (!emailStatus) return;
+  setTimeout(() => {
+    emailStatus.classList.add("hidden");
+  }, 4000);
 }
 
-function showAuthError(el, msg) {
-  el.textContent = msg;
-  el.classList.remove("hidden");
-}
-
-async function loadWrongWordsFromSupabase() {
-  if (!supabase) return;
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  const { data } = await supabase.from("wrong_words").select("words").eq("user_id", user.id).single();
-  if (data?.words && Array.isArray(data.words)) {
-    wrongWordsBook = data.words;
-    renderWordbook();
-  }
-}
-
-async function saveWrongWordsToSupabase() {
-  if (!supabase) return;
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  await supabase.from("wrong_words").upsert({
-    user_id: user.id,
-    words: wrongWordsBook,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: "user_id" });
-}
-
-async function initAuth() {
-  if (!supabase) return;
-  const { data: { session } } = await supabase.auth.getSession();
-  showAuthUI(session?.user);
-  if (session?.user) await loadWrongWordsFromSupabase();
-}
-
-// 로그인
-loginForm?.addEventListener("submit", async (e) => {
+emailForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  loginError.classList.add("hidden");
-  if (!supabase) {
-    showAuthError(loginError, "Supabase가 설정되지 않았습니다. config.js를 확인하세요.");
+  if (!wrongWordsBook.length) {
+    showEmailStatus("error", "보낼 단어가 없습니다. 퀴즈를 먼저 풀어 주세요.");
+    hideEmailStatusWithDelay();
     return;
   }
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) {
-    showAuthError(loginError, error.message === "Invalid login credentials" ? "이메일 또는 비밀번호가 올바르지 않습니다." : error.message);
+  const email = emailInput.value.trim();
+  if (!email) {
+    showEmailStatus("error", "이메일 주소를 입력해 주세요.");
+    hideEmailStatusWithDelay();
     return;
   }
-  closeAuthModal("loginModal");
-  loginForm.reset();
-  showAuthUI(data.user);
-  await loadWrongWordsFromSupabase();
-});
-
-// 회원가입
-signupForm?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  signupError.classList.add("hidden");
-  if (!supabase) {
-    showAuthError(signupError, "Supabase가 설정되지 않았습니다. config.js를 확인하세요.");
-    return;
+  emailForm.classList.add("sending");
+  if (emailSubmitBtn) {
+    emailSubmitBtn.disabled = true;
+    emailSubmitBtn.textContent = "전송 중...";
   }
-  const username = document.getElementById("signupUsername").value.trim();
-  const email = document.getElementById("signupEmail").value.trim();
-  const password = document.getElementById("signupPassword").value;
-  const passwordConfirm = document.getElementById("signupPasswordConfirm").value;
-  if (password !== passwordConfirm) {
-    showAuthError(signupError, "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-    return;
+  try {
+    const response = await fetch("/api/send-wordbook", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, words: wrongWordsBook }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.error || "이메일 전송에 실패했습니다.");
+    }
+    showEmailStatus("success", "틀린 단어 목록을 전송했습니다!");
+    emailForm.reset();
+  } catch (error) {
+    showEmailStatus("error", error.message || "이메일 전송에 실패했습니다.");
+  } finally {
+    if (emailSubmitBtn) {
+      emailSubmitBtn.disabled = false;
+      emailSubmitBtn.textContent = "이메일 전송";
+    }
+    emailForm.classList.remove("sending");
+    hideEmailStatusWithDelay();
   }
-  if (password.length < 6) {
-    showAuthError(signupError, "비밀번호는 6자 이상이어야 합니다.");
-    return;
-  }
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { username } },
-  });
-  if (error) {
-    showAuthError(signupError, error.message);
-    return;
-  }
-  closeAuthModal("signupModal");
-  signupForm.reset();
-  showAuthUI(data.user);
-  wrongWordsBook = [];
-  renderWordbook();
-});
-
-// 로그아웃
-logoutBtn?.addEventListener("click", async () => {
-  if (supabase) await supabase.auth.signOut();
-  wrongWordsBook = [];
-  showAuthUI(null);
-  renderWordbook();
-});
-
-// 모달 열기/닫기
-loginBtn?.addEventListener("click", () => loginModal.classList.remove("hidden"));
-signupBtn?.addEventListener("click", () => signupModal.classList.remove("hidden"));
-document.querySelectorAll("[data-close]").forEach((btn) => {
-  btn.addEventListener("click", () => closeAuthModal(btn.dataset.close));
-});
-[loginModal, signupModal].forEach((m) => {
-  m?.addEventListener("click", (e) => {
-    if (e.target === m) m.classList.add("hidden");
-  });
 });
 
 // 모드 버튼
@@ -489,7 +402,6 @@ function renderChoices(options, correctAnswer, isCorrect, item) {
             ko: item.ko,
             date: `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`,
           });
-          saveWrongWordsToSupabase();
         }
       }
       let wrongMsg = `오답입니다. 정답: ${correctAnswer}`;
@@ -591,7 +503,6 @@ function escapeHtml(str) {
 function removeFromWordbook(ja) {
   wrongWordsBook = wrongWordsBook.filter((w) => w.ja !== ja);
   renderWordbook();
-  saveWrongWordsToSupabase();
 }
 
 function showResult() {
@@ -634,4 +545,4 @@ closeWordbookBtn.addEventListener("click", closeWordbookModal);
 wordbookModal.addEventListener("click", (e) => {
   if (e.target === wordbookModal) closeWordbookModal();
 });
-initAuth().then(() => renderWordbook());
+renderWordbook();
