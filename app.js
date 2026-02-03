@@ -238,7 +238,6 @@ const resultWordbookList = document.getElementById("resultWordbookList");
 const wordbookList = document.getElementById("wordbookList");
 const wordbookEmpty = document.getElementById("wordbookEmpty");
 const emailForm = document.getElementById("emailForm");
-const emailInput = document.getElementById("emailInput");
 const emailStatus = document.getElementById("emailStatus");
 const emailSubmitBtn = emailForm?.querySelector("button");
 
@@ -273,12 +272,6 @@ emailForm?.addEventListener("submit", async (e) => {
     hideEmailStatusWithDelay();
     return;
   }
-  const email = emailInput.value.trim();
-  if (!email) {
-    showEmailStatus("error", "이메일 주소를 입력해 주세요.");
-    hideEmailStatusWithDelay();
-    return;
-  }
   emailForm.classList.add("sending");
   if (emailSubmitBtn) {
     emailSubmitBtn.disabled = true;
@@ -288,14 +281,13 @@ emailForm?.addEventListener("submit", async (e) => {
     const response = await fetch("/api/send-wordbook", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, words: wrongWordsBook }),
+      body: JSON.stringify({ words: wrongWordsBook }),
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) {
       throw new Error(result.error || "이메일 전송에 실패했습니다.");
     }
-    showEmailStatus("success", "틀린 단어 목록을 전송했습니다!");
-    emailForm.reset();
+    showEmailStatus("success", "sivial12100@gmail.com 으로 전송했습니다!");
   } catch (error) {
     showEmailStatus("error", error.message || "이메일 전송에 실패했습니다.");
   } finally {

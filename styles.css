@@ -456,27 +456,11 @@ body {
   border-top: 1px solid var(--border);
 }
 
-.email-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.email-helper {
   font-size: 0.85rem;
   color: var(--text-muted);
   margin-bottom: 0.75rem;
-}
-
-.email-form input {
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg-elevated);
-  color: var(--text);
-  font-size: 0.95rem;
-}
-
-.email-form input:focus {
-  outline: none;
-  border-color: var(--border-focus);
+  line-height: 1.5;
 }
 
 .email-form .btn-primary {

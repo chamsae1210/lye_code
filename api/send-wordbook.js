@@ -1,14 +1,12 @@
+const TARGET_EMAIL = "sivial12100@gmail.com";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { email, words } = req.body || {};
-
-  if (!email || typeof email !== "string") {
-    return res.status(400).json({ error: "유효한 이메일 주소를 입력해 주세요." });
-  }
+  const { words } = req.body || {};
 
   if (!Array.isArray(words) || words.length === 0) {
     return res.status(400).json({ error: "전송할 단어가 없습니다." });
@@ -60,7 +58,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         from,
-        to: [email],
+        to: [TARGET_EMAIL],
         subject,
         html,
       }),
