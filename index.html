@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>일본어 단어 퀴즈 | 日本語クイズ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <main class="container">
+    <header class="header">
+      <h1>日本語クイズ</h1>
+      <p class="subtitle">일본어 단어 퀴즈</p>
+    </header>
+
+    <section class="start-screen" id="startScreen">
+      <div class="mode-select">
+        <p class="mode-label">퀴즈 모드 선택</p>
+        <div class="mode-buttons">
+          <button type="button" class="btn btn-mode" data-mode="ja-to-ko">일본어 → 한국어</button>
+          <button type="button" class="btn btn-mode" data-mode="ko-to-ja">한국어 → 일본어</button>
+        </div>
+      </div>
+      <div class="quiz-options">
+        <label class="option-row">
+          <span>난이도</span>
+          <select id="levelSelect">
+            <option value="n5">N5 (가장 쉬움)</option>
+            <option value="n4">N4</option>
+            <option value="n3" selected>N3</option>
+            <option value="n2">N2</option>
+            <option value="n1">N1 (가장 어려움)</option>
+          </select>
+        </label>
+        <label class="option-row">
+          <span>문제 수</span>
+          <select id="questionCount">
+            <option value="5">5문제</option>
+            <option value="10" selected>10문제</option>
+            <option value="15">15문제</option>
+            <option value="20">20문제</option>
+          </select>
+        </label>
+      </div>
+      <button type="button" class="btn btn-primary btn-start" id="startBtn">퀴즈 시작</button>
+      <button type="button" class="btn btn-wordbook" id="openWordbookBtn">틀린 단어 모아놓은 단어장 <span id="wordbookCount">(0)</span></button>
+    </section>
+
+    <section class="quiz-screen hidden" id="quizScreen">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <p class="question-counter" id="questionCounter">1 / 10</p>
+      <div class="question-card">
+        <p class="question-text" id="questionText"></p>
+        <p class="question-hint" id="questionHint"></p>
+      </div>
+      <div class="choices" id="choices"></div>
+      <p class="feedback hidden" id="feedback"></p>
+      <button type="button" class="btn btn-next hidden" id="nextBtn">다음</button>
+    </section>
+
+    <section class="result-screen hidden" id="resultScreen">
+      <div class="result-card">
+        <h2>결과</h2>
+        <div class="score-circle" id="scoreCircle">
+          <span class="score-value" id="scoreValue">0</span>
+          <span class="score-total" id="scoreTotal">/ 10</span>
+        </div>
+        <p class="score-message" id="scoreMessage"></p>
+        <button type="button" class="btn btn-primary" id="retryBtn">다시 하기</button>
+        <div class="wrong-words-section hidden" id="resultWordbookSection">
+          <h3>틀린 단어장</h3>
+          <ul class="wrong-words-list" id="resultWordbookList"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 틀린 단어장 모달 -->
+  <div class="wordbook-modal-overlay hidden" id="wordbookModal">
+    <div class="wordbook-modal">
+      <div class="wordbook-modal-header">
+        <h3>틀린 단어장</h3>
+        <button type="button" class="btn btn-close-modal" id="closeWordbookBtn" aria-label="닫기">×</button>
+      </div>
+      <div class="wordbook-modal-body">
+        <ul class="wrong-words-list" id="wordbookList"></ul>
+        <p class="wordbook-empty hidden" id="wordbookEmpty">틀린 단어가 없습니다.</p>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
