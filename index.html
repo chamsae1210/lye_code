@@ -13,7 +13,15 @@
   <div class="bg-pattern"></div>
   <main class="container">
     <header class="header">
-      <h1>日本語クイズ</h1>
+      <div class="header-top">
+        <h1>日本語クイズ</h1>
+        <div class="user-area" id="userArea">
+          <span class="user-name hidden" id="userName"></span>
+          <button type="button" class="btn btn-auth" id="loginBtn">로그인</button>
+          <button type="button" class="btn btn-auth" id="signupBtn">회원가입</button>
+          <button type="button" class="btn btn-auth btn-logout hidden" id="logoutBtn">로그아웃</button>
+        </div>
+      </div>
       <p class="subtitle">일본어 단어 퀴즈</p>
     </header>
 
@@ -94,6 +102,61 @@
       </div>
     </div>
   </div>
+
+  <!-- 로그인 모달 -->
+  <div class="auth-modal-overlay hidden" id="loginModal">
+    <div class="auth-modal">
+      <div class="auth-modal-header">
+        <h3>로그인</h3>
+        <button type="button" class="btn btn-close-modal" data-close="loginModal">×</button>
+      </div>
+      <form class="auth-form" id="loginForm">
+        <label>
+          <span>이메일</span>
+          <input type="email" id="loginEmail" required placeholder="example@email.com">
+        </label>
+        <label>
+          <span>비밀번호</span>
+          <input type="password" id="loginPassword" required>
+        </label>
+        <p class="auth-error hidden" id="loginError"></p>
+        <button type="submit" class="btn btn-primary">로그인</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 회원가입 모달 -->
+  <div class="auth-modal-overlay hidden" id="signupModal">
+    <div class="auth-modal">
+      <div class="auth-modal-header">
+        <h3>회원가입</h3>
+        <button type="button" class="btn btn-close-modal" data-close="signupModal">×</button>
+      </div>
+      <form class="auth-form" id="signupForm">
+        <label>
+          <span>아이디</span>
+          <input type="text" id="signupUsername" required minlength="2" placeholder="2자 이상">
+        </label>
+        <label>
+          <span>이메일</span>
+          <input type="email" id="signupEmail" required placeholder="example@email.com">
+        </label>
+        <label>
+          <span>비밀번호</span>
+          <input type="password" id="signupPassword" required minlength="6" placeholder="6자 이상">
+        </label>
+        <label>
+          <span>비밀번호 확인</span>
+          <input type="password" id="signupPasswordConfirm" required placeholder="비밀번호 다시 입력">
+        </label>
+        <p class="auth-error hidden" id="signupError"></p>
+        <button type="submit" class="btn btn-primary">회원가입</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

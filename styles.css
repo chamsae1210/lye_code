@@ -62,6 +62,50 @@ body {
   margin-bottom: 2rem;
 }
 
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.header-top h1 {
+  margin: 0;
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-name {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-right: 0.25rem;
+}
+
+.btn-auth {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-auth:hover {
+  border-color: var(--border-focus);
+}
+
+.btn-logout {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+}
+
 .header h1 {
   font-family: var(--font-ja);
   font-size: 1.75rem;
@@ -74,6 +118,83 @@ body {
   font-size: 0.95rem;
   color: var(--text-muted);
   margin-top: 0.25rem;
+}
+
+/* 인증 모달 */
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.auth-modal {
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.auth-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.auth-modal-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.auth-form {
+  padding: 1.25rem;
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.auth-form label span {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-ko);
+  font-size: 0.95rem;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.auth-error {
+  font-size: 0.85rem;
+  color: var(--wrong);
+  margin-bottom: 1rem;
+}
+
+.auth-form .btn-primary {
+  width: 100%;
+  margin-top: 0.5rem;
 }
 
 /* Start screen */
